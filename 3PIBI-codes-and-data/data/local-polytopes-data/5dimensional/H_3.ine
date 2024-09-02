@@ -1,0 +1,37 @@
+* cdd: Double Description Method C-Code:Version 0.61 (December 1, 1997)
+* Copyright (C) 1996, Komei Fukuda, fukuda@ifor.math.ethz.ch
+*Input File:V_3_extremal.ext   (  21  x    6)
+*HyperplaneOrder: LexMin
+*Degeneracy preknowledge for computation: None (possible degeneracy)
+*Hull computation is chosen.
+*Computation starts     at Mon Oct 08 15:26:53 2018
+*            terminates at Mon Oct 08 15:26:53 2018
+*Total processor time = 0 seconds
+*                     = 0 hour 0 min 0 sec
+*Since hull computation is chosen, the output is a minimal inequality system
+*FINAL RESULT:
+*Number of Facets =      20
+H-representation
+begin
+       20      6    real
+  0  0  0  1  0  0
+  0  2  1  0  0 -4
+  0  1  0  1 -1 -1
+  0  4 -1  4 -5 -2
+  0  2  0  2 -3 -1
+ 12 -6  1  4  2  4
+  4 -2  1  2  0  2
+  0  0  1  0  0  0
+  4 -2  1  0  2  0
+  0  2  0 -1 -3  2
+  0  2  1  0 -4  0
+  0  1  0 -1 -1  1
+  0  4 -1 -2 -5  4
+  0  2  1 -4  0  0
+  0  0  0  0  0  1
+  0  0  0  0  1  0
+  0  2 -1  0 -2  0
+ 12 -4  1  0  2  0
+  6 -2  0  1  0  1
+  0  2  1 -4  2 -4
+end

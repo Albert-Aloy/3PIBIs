@@ -1,0 +1,72 @@
+# 3-outcome Permutationaly Invariant Bell Inequalities (3PIBIs)
+
+## Recall the directory Structure
+├── data/ # Data files
+├── scripts-functions/ # Main scripts and functions
+├── examples/ # Example scripts
+└── docs/ # Documentation
+
+% Start by adding the directories to the path
+addpath(genpath('~\3PIBI-codes-and-data'))
+
+## Derivation of Bell inequalities using the polytope approach
+% obtain table of local determinist strategies for n parties
+% (vertices of the local polytope)
+V = build_lds_table(n);
+V = build_lds_table_5dimensional(n);
+
+% obtain the Bell inequalities
+% (hyperplanes of the local polytope)
+we use fukuda's cdd to obtain the convex hull
+
+% to rewrite the 5-dimensional 3PIBI in its full-dimensional form
+BI = from_5dim_to_FullDim([1 1 0 -2 0 0]); % inequality #1 from Table II in arXiv 2406.11792
+
+% check the classical bound of some given BI for an arbitrary number of parties n
+find_classical_bound(n, BI)
+
+## Derivation of Bell inequalities using the polytope approach
+% use the mathematica notebook 'sdp-constraints-hierarchy-3PIBI' to compute the constraints
+% these can be imported in matlab using import_constraints(filename)
+% we have them pre-computed in 3PIBI-codes-and-data\data\data-driven-data\M_constraints.mat
+% for example, to load the 1st moment constrants for 15 parties we do:
+load('data\data-driven-data\M_constraints.mat', 'M15') % M15 contains the 1st moment data-driven constraints for n = 15
+
+% the next thing we need is the vector containing the collective conditional probabilities
+Pdata = [1, P00, P01, P10, P11, P0000, P0100, P1100, P0101, P0110, P0001, P1101, P0011, P0111, P1111]
+
+% if one does not have Pdata, but has a 2-body reduced density matrix of a symmetric state and the local projectors, one can do:
+Pdata  = build_point_fulldim(n, rho2, proj0, proj1) % where n is the number of parties, rho2 the 2-body RDM, and proj0 proj1 are arrays containing the local projectors to each level proj0 = {proj0_1, proj0_2, proj0_3}
+
+% if the state is not symmetric (and the 2-body RDMs are different), one can then do:
+Pdata  = build_point_fulldim_RDMs(n, RDMs, proj0, proj1) % where now RDMs is an array gathering the 2-body RDMs pair by pair. e.g., RDMs{1,2} is the 2-body RDM tracing out all parties except parties 1 and 2
+
+% we are now ready to test the data-driven method and see if we detect nonlocality in the statistical point Pdata
+res = data_driven_sdp_nolambda(M, Pdata);
+% if infeasible, BI = res{2} gives a Bell inequality violated by Pdata. One can then check that Pdata*BI' < 0
+
+## Data-driven case example: detecting nonlocality on a pure qutrit Dicke state
+% start by generating the qutrit pure Dicke state for n=15 parties
+n=32; d=3; dim=nchoosek(n+d-1, d-1);
+dickePure=zeros(dim, 1); % to initialize the state in the symmetric subspace of dimensions nchoosek(n+d-1, d-1)
+dickePure(340) = 1; % quite balanced in excitations between the three-levels
+
+% next we obtaining its 2-body RDM and the projectors of the measurements to later get the vector of conditional probabilities p
+load('A_matrices.mat', 'A32');
+rho2 = get_rdm(dickePure*dickePure',3,2,A32);
+
+% and the projectors of the measurements in two directions of the Sx-Sz plane that we arbitrarily choose
+[Sx,Sy,Sz,Qyz,Qxz,Qxy,Qxx,Qzz,Qyy] = generateS(); % call script to get the dipole S and quadrupole Q observables
+t=43;q=50;step=pi/100; % set the arbitrary directions
+proj0 = get_proj(Sx*cos(t*step)+Sz*sin(t*step)); % obtain the projectors from the observables
+proj1 = get_proj(Sx*cos(q*step)+Sz*sin(q*step));
+
+% finally we get the vector of conditional probabilities
+p = build_point_fulldim(n, rho2, proj0, proj1);
+
+% Now we proceed to call the data-driven SDP method
+load('M_constraints.mat', 'M32');
+sdp_res = build_sdp_spin1_violation_nolambda(M32,p); % which is infeasible, thus showing that p is outside of the local polytope
+BI = sdp_res{2}; % here we have stored the dual variables of the infeasible problem, which are a Bell inequality violated by p:
+BI*p' % to see that indeed there is Bell violation
+
